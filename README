@@ -3,3 +3,10 @@ Stephen Petrides
 Andrew Macneille
 
 A multithreaded and a multiprocessed multipart compression program.
+
+DESIGN
+
+Take an uncompressed txt file (bigfile.txt) as input and output multiple compressed files (bigfile_txt_RLE, bigfile_txt_LOLS, bigfile_txt_LOLS0, bigfile_txt_LOLS1).
+
+The multitreaded program will spawn threads for each part (compressT_LOLS).
+The multiprocessed program will spawn children for each part (compressR_LOLS).
