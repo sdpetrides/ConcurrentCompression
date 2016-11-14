@@ -6,7 +6,7 @@ compressR_LOLS: compressR_LOLS.c compressR_worker_LOLS.c compressR_LOLS.h
 	gcc -Wall -g -o compressR_LOLS compressR_LOLS.c compressR_worker_LOLS.c
 
 compressT_LOLS: compressT_LOLS.c compressT_LOLS.h
-	gcc -Wall -g -o compressT_LOLS compressT_LOLS.c 
+	gcc -Wall -g -pthreads -o compressT_LOLS compressT_LOLS.c
 
 clean:
 	rm -f compressR_LOLS

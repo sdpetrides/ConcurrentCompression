@@ -22,7 +22,7 @@ int main(int argc, char const *argv[]) {
 	
 	// Check for -h flag
 	if (strcmp(argv[1], "-h") == 0) {
-		printf("Enter in \"y86emul\" followed by a space and then the filename\n");
+		printf("./compressR_LOLS ./file.txt <int>\n");
 		return 0;
 	}
 	
