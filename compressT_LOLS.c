@@ -5,6 +5,9 @@
 #include <pthread.h>
 #include "compressT_LOLS.h"
 
+long int UNCOMP_LEN;
+long int PARTS;
+
 /* COMPRESS
  * 
  * @param1: uncompressed filename
@@ -20,10 +23,19 @@ void compress(Thread_data * td) {
 
 	// Verify that file was opened
 	if (fp == NULL) {
-		printf("Thread %ld could find file: %s\n", td->thread_id, td->filename);
+		printf("Thread %ld could not open file: %s\n", td->thread_id, td->filename);
 		return;
 	} else {
 		printf("Thread %ld has opened file: %s\n", td->thread_id, td->filename);
+	}
+
+	char buffer[255];
+	fscanf(fp, "%s", buffer);
+
+	// Compress string
+	int i;
+	for (i = 0; i < td->chunk; i++) {
+		td->str[i] = buffer[i+td->start];
 	}
 
 	// Close uncompressed file
@@ -44,20 +56,15 @@ int main(int argc, char const *argv[]) {
 
 	// Check for correct parameters
 	if (argc != 3) {
-		fprintf(stderr,"Arguments given are not in valid form.\n");
-		return -1;
-	}
-	
-	// Check for -h flag
-	if (strcmp(argv[1], "-h") == 0) {
-		printf("./compressT_LOLS ./file.txt <int>\n");
+		fprintf(stderr,"Arguments given are not in valid form. Use following order:\n");
+		printf("$ ./compressT_LOLS ./file.txt <int>\n");
 		return 0;
 	}
 
 	// Get command line arguments
 	char * filename = (char *)malloc(sizeof(char)*strlen(argv[1]));
 	filename = strcpy(filename, argv[1]);
-	int parts = atoi(argv[2]);
+	PARTS = atoi(argv[2]);
 
 	// Open uncompressed file
 	FILE* fp;
@@ -69,18 +76,23 @@ int main(int argc, char const *argv[]) {
 		exit(1);
 	}
 
+	// Get length of uncompressed string
+	char buffer[255];
+	fscanf(fp, "%s", buffer);
+	UNCOMP_LEN = strlen(buffer);
+
 	// Close uncompressed file
 	fclose(fp);
 
 	// Initialize threads, strings, and thread data
-	pthread_t threads[parts];
-	char * compressed_strings[parts];
-	Thread_data * td[parts];
+	pthread_t threads[PARTS];
+	char * compressed_strings[PARTS];
+	Thread_data * td[PARTS];
 
 	// Open threads
 	int flag = 0;
 	long int i;
-	for (i = 0; i < parts; i++) {
+	for (i = 0; i < PARTS; i++) {
 
 		// Allocate string for compression
 		compressed_strings[i] = (char *)malloc(sizeof(char)*10);
@@ -88,7 +100,8 @@ int main(int argc, char const *argv[]) {
 		// Allocate and initialize thread data
 		td[i] = (Thread_data *)malloc(sizeof(Thread_data));
 		td[i]->thread_id = i;
-		td[i]->parts = parts;
+		td[i]->chunk = (UNCOMP_LEN/PARTS);
+		td[i]->start = i*(UNCOMP_LEN/PARTS);
 		td[i]->filename = filename;
 		td[i]->str = compressed_strings[i];
 		
@@ -105,9 +118,10 @@ int main(int argc, char const *argv[]) {
 
 	// Free compressed strings, thread data, and close threads
 	flag = 0;
-	for (i = 0; i < parts; i++) {
+	for (i = 0; i < PARTS; i++) {
 
 		// Free compressed string and thread data
+		printf("%s\n", compressed_strings[i]);
 		free(compressed_strings[i]);
 		free(td[i]);
 

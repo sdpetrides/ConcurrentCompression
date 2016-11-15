@@ -4,7 +4,8 @@
 // Structs
 typedef struct thread_data {
 	long int thread_id;
-	int parts;
+	int chunk;
+	int start;
 	char * filename;
 	char * str;
 } Thread_data;
