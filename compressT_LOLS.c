@@ -5,8 +5,40 @@
 #include <pthread.h>
 #include "compressT_LOLS.h"
 
+// Globals
 long int UNCOMP_LEN;
 long int PARTS;
+int CHUNK[255];
+int START[255];
+
+/* INIT_CHUNK 
+ *
+ * Uses globals UNCOMP_LEN and PARTS to set the chunk size
+ * and start index for each thread.
+ */
+void init_chunk() {
+
+	// Initialize minimum chunk size and remainder
+	int min_size = (int)(UNCOMP_LEN / PARTS);
+	int rem = (int)(UNCOMP_LEN % PARTS);
+
+	// Set minimum chunk size
+	int i;
+	for (i = 0; i < PARTS; i++) {
+		CHUNK[i] = min_size;	
+	}
+
+	// Add one to all chunks with remainder
+	for (i = 0; i < rem; i++) {
+		CHUNK[i]++;	
+	}
+
+	// Use start of i and size of i to set start of i+1
+	START[0] = 0;
+	for (i = 0; i < PARTS; i++) {
+		START[i+1] = CHUNK[i] + START[i];	
+	}
+}
 
 /* COMPRESS
  * 
@@ -23,23 +55,53 @@ void compress(Thread_data * td) {
 
 	// Verify that file was opened
 	if (fp == NULL) {
-		printf("Thread %ld could not open file: %s\n", td->thread_id, td->filename);
+		printf("ERROR: Thread %ld could not open file: %s\n", td->thread_id, td->filename);
 		return;
 	} else {
-		printf("Thread %ld has opened file: %s\n", td->thread_id, td->filename);
+		//printf("Thread %ld has opened file: %s\n", td->thread_id, td->filename);
 	}
 
+	// Extract buffer
 	char buffer[255];
 	fscanf(fp, "%s", buffer);
 
-	// Compress string
-	int i;
-	for (i = 0; i < td->chunk; i++) {
-		td->str[i] = buffer[i+td->start];
-	}
-
 	// Close uncompressed file
 	fclose(fp);
+
+	// COMPRESS STRING HERE
+	int i;
+	for (i = 0; i < CHUNK[td->thread_id]; i++) {
+		td->str[i] = buffer[i+START[td->thread_id]];
+	}
+
+	// Create output filename
+	char * out_filename = (char *)calloc(strlen(td->filename)+15, sizeof(char));
+	out_filename = strcpy(out_filename, td->filename);
+
+	// Replace '.' with '_'
+	for (i = 1; i < strlen(td->filename); i++) {
+		if (out_filename[i] == '.') {
+			out_filename[i] = '_';
+		}
+	}
+
+	// Contatonate _LOLSX.txt
+	char * suffix = (char *)calloc(15, sizeof(char));
+	sprintf(suffix, "_LOLS%ld.txt", td->thread_id);
+	strcat(out_filename, suffix);
+	printf("%s\n", out_filename);
+	free(suffix);
+
+	// Open uncompressed file
+	FILE* fp_out;
+	fp_out = fopen(out_filename, "w+");
+
+	// Write string to compressed file
+	fputs(td->str, fp_out);
+
+	// Close compressed file
+	fclose(fp_out);
+	free(out_filename);
 
 	return;
 }
@@ -79,10 +141,15 @@ int main(int argc, char const *argv[]) {
 	// Get length of uncompressed string
 	char buffer[255];
 	fscanf(fp, "%s", buffer);
+	printf("%s\n", buffer);
 	UNCOMP_LEN = strlen(buffer);
+
 
 	// Close uncompressed file
 	fclose(fp);
+
+	// Initialize chunk sizes and start sites
+	init_chunk();
 
 	// Initialize threads, strings, and thread data
 	pthread_t threads[PARTS];
@@ -95,13 +162,11 @@ int main(int argc, char const *argv[]) {
 	for (i = 0; i < PARTS; i++) {
 
 		// Allocate string for compression
-		compressed_strings[i] = (char *)malloc(sizeof(char)*10);
+		compressed_strings[i] = (char *)malloc(sizeof(char)*(CHUNK[0]+1));
 
 		// Allocate and initialize thread data
 		td[i] = (Thread_data *)malloc(sizeof(Thread_data));
 		td[i]->thread_id = i;
-		td[i]->chunk = (UNCOMP_LEN/PARTS);
-		td[i]->start = i*(UNCOMP_LEN/PARTS);
 		td[i]->filename = filename;
 		td[i]->str = compressed_strings[i];
 		
@@ -112,7 +177,7 @@ int main(int argc, char const *argv[]) {
 		if (flag) {
 			fprintf(stderr, "ERROR: pthread_create() exited with status %d\n", flag);
 		} else {
-			printf("Thread %ld created\n", i);
+			//printf("Thread %ld created\n", i);
 		}
 	}
 
@@ -132,7 +197,7 @@ int main(int argc, char const *argv[]) {
 		if (flag) {
 			fprintf(stderr, "ERROR: pthread_join() exited with status %d\n", flag);
 		} else {
-			printf("Thread %ld joined\n", i);
+			//printf("Thread %ld joined\n", i);
 		}
 	}
 
