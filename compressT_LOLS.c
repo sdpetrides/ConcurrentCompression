@@ -74,34 +74,20 @@ void compress(Thread_data * td) {
 		td->str[i] = buffer[i+START[td->thread_id]];
 	}
 
-	// Create output filename
-	char * out_filename = (char *)calloc(strlen(td->filename)+15, sizeof(char));
-	out_filename = strcpy(out_filename, td->filename);
+	// Open compressed file
+	FILE* fp_out;
+	fp_out = fopen(td->out_filename, "w+");
 
-	// Replace '.' with '_'
-	for (i = 1; i < strlen(td->filename); i++) {
-		if (out_filename[i] == '.') {
-			out_filename[i] = '_';
-		}
+	if (fp_out == NULL) {
+		printf("ERROR: Thread %ld could not open file: %s\n", td->thread_id, td->out_filename);
+		return;
 	}
 
-	// Contatonate _LOLSX.txt
-	char * suffix = (char *)calloc(15, sizeof(char));
-	sprintf(suffix, "_LOLS%ld.txt", td->thread_id);
-	strcat(out_filename, suffix);
-	printf("%s\n", out_filename);
-	free(suffix);
-
-	// Open uncompressed file
-	FILE* fp_out;
-	fp_out = fopen(out_filename, "w+");
-
 	// Write string to compressed file
-	fputs(td->str, fp_out);
+	fprintf(fp_out, "%s", td->str);
 
 	// Close compressed file
 	fclose(fp_out);
-	free(out_filename);
 
 	return;
 }
@@ -124,8 +110,8 @@ int main(int argc, char const *argv[]) {
 	}
 
 	// Get command line arguments
-	char * filename = (char *)malloc(sizeof(char)*strlen(argv[1]));
-	filename = strcpy(filename, argv[1]);
+	char * filename = (char *)calloc(strlen(argv[1]), sizeof(char));
+	strcpy(filename, argv[1]);
 	PARTS = atoi(argv[2]);
 
 	// Open uncompressed file
@@ -141,9 +127,7 @@ int main(int argc, char const *argv[]) {
 	// Get length of uncompressed string
 	char buffer[255];
 	fscanf(fp, "%s", buffer);
-	printf("%s\n", buffer);
 	UNCOMP_LEN = strlen(buffer);
-
 
 	// Close uncompressed file
 	fclose(fp);
@@ -154,20 +138,43 @@ int main(int argc, char const *argv[]) {
 	// Initialize threads, strings, and thread data
 	pthread_t threads[PARTS];
 	char * compressed_strings[PARTS];
+	char * out_filename[PARTS];
 	Thread_data * td[PARTS];
+
+	// Create ouput filenames
+	int k;
+	for (k = 0; k < PARTS; k++) {
+		out_filename[k] = (char *)calloc(strlen(filename)+20, sizeof(char));
+		strcpy(out_filename[k], filename);
+
+		// Replace '.' with '_'
+		int j;
+		for (j = 1; j < strlen(filename); j++) {
+			if (out_filename[k][j] == '.') {
+				out_filename[k][j] = '_';
+			}
+		}
+
+		// Concatonate _LOLSX.txt to filename
+		char suffix[strlen(filename)+15];
+		sprintf(suffix, "_LOLS%d.txt", k);
+		strcat(out_filename[k], suffix);
+		printf("%s\n", out_filename[k]);
+	}
 
 	// Open threads
 	int flag = 0;
 	long int i;
 	for (i = 0; i < PARTS; i++) {
 
-		// Allocate string for compression
-		compressed_strings[i] = (char *)malloc(sizeof(char)*(CHUNK[0]+1));
+		// Allocate string for compression and output filename
+		compressed_strings[i] = (char *)calloc((CHUNK[0]+1), sizeof(char));
 
 		// Allocate and initialize thread data
-		td[i] = (Thread_data *)malloc(sizeof(Thread_data));
+		td[i] = (Thread_data *)calloc(1, sizeof(Thread_data));
 		td[i]->thread_id = i;
 		td[i]->filename = filename;
+		td[i]->out_filename = out_filename[i];
 		td[i]->str = compressed_strings[i];
 		
 		// Create thread
@@ -185,13 +192,13 @@ int main(int argc, char const *argv[]) {
 	flag = 0;
 	for (i = 0; i < PARTS; i++) {
 
-		// Free compressed string and thread data
-		printf("%s\n", compressed_strings[i]);
-		free(compressed_strings[i]);
-		free(td[i]);
-
 		// Join thread
 		flag = pthread_join(threads[i], NULL);
+
+		// Free compressed string and thread data
+		free(compressed_strings[i]);
+		free(out_filename[i]);
+		free(td[i]);
 
 		// Erroring checking
 		if (flag) {
@@ -200,6 +207,9 @@ int main(int argc, char const *argv[]) {
 			//printf("Thread %ld joined\n", i);
 		}
 	}
+
+	// Free filename string
+	free(filename);
 
 	return 0;
 }
