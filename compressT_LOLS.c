@@ -73,6 +73,48 @@ void compress(Thread_data * td) {
 	for (i = 0; i < CHUNK[td->thread_id]; i++) {
 		td->str[i] = buffer[i+START[td->thread_id]];
 	}
+	char a; 
+	char b;
+	char c;
+	int count = 1;
+	int index = 0;
+	int chunkLen = CHUNK[td->thread_id];
+
+	for(int i = 1; i <= chunkLen; i++){
+		//printf("%d\n", i );
+		a = td->str[i-1];
+		b = td->str[i];
+		
+
+
+		if(a == b){
+			count++;
+		}else{
+			if(count == 1){
+				td->str[index] = a;
+				index ++;
+			}else if(count == 2){
+				td->str[index] = a;
+				td->str[index+1] = a;
+				index = index + 2;
+			}else{
+
+				c = count +'0';
+				td->str[index] = c;
+				td->str[index+1] = a;
+				index = index + 2;
+			}
+			count = 1;
+		}
+	}
+	while(index < chunkLen){
+		
+		td->str[index] = '\0';
+		index++;
+	}
+	
+
+
 
 	// Open compressed file
 	FILE* fp_out;
@@ -84,6 +126,7 @@ void compress(Thread_data * td) {
 	}
 
 	// Write string to compressed file
+	
 	fprintf(fp_out, "%s", td->str);
 
 	// Close compressed file
