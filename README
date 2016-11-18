@@ -11,8 +11,10 @@ Take an uncompressed txt file (bigfile.txt) as input and output multiple compres
 The multitreaded program will spawn threads for each part (compressT_LOLS).
 The multiprocessed program will spawn children for each part (compressR_LOLS).
 
-Special Case Handling
+SPECIAL CASE HANDLING
 
 If there not an even split of the characters to parts, we put the entire remainder into the first file.
-
--- must be able to handle non-alphabetical characters --
+Non-alphabetical characters are skipped and not considered in the compressed string.
+Our first output file is named with a filename_txt_LOLS0.txt.
+Our maximum string size is 1000 characters. After this mark the program will exit and report the maximum character limit has been reached.
+An error is reported and the program exits if the number of parts is less than one.

@@ -10,6 +10,7 @@ typedef struct thread_data {
 } Thread_data;
 
 // Functions
+int isAlpha(int c);
 void init_chunk();
 void compress(Thread_data * td);
 

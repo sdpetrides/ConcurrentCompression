@@ -13,6 +13,20 @@ long int PARTS;
 int CHUNK[MAX_STRING_SIZE];
 int START[MAX_STRING_SIZE];
 
+/* ISALPHA
+ * 
+ * @param1: ascii integer value
+ *
+ * Returns true if the input value is an alphabetical character
+ */
+int isAlpha(int c) {
+	if ((c > 64 && c < 91) || (c > 96 && c < 123)) {
+		return 1;
+	} else {
+		return 0;
+	}
+}
+
 /* INIT_CHUNK 
  *
  * Uses globals UNCOMP_LEN and PARTS to set the chunk size
@@ -75,14 +89,22 @@ void compress(Thread_data * td) {
 	int i;
 	int chunk_len = CHUNK[td->thread_id];
 	for (i = 0; i < chunk_len; i++) {
-		td->str[i] = buffer[i+START[td->thread_id]];
+
+		// Get character from buffer
+		char c = buffer[i+START[td->thread_id]];
+
+		// Check if alphabetical
+		if (isAlpha((int)c)) {
+			td->str[i] = c;
+		}	
 	}
 
 	// Initialize counter variables
 	char a, b, c; 
+	char dd[10];
 	int count = 1;
 	int j = 0;
-
+	int l;
 
 	// Compress string
 	for (i = 1; i <= chunk_len; i++) {
@@ -99,11 +121,22 @@ void compress(Thread_data * td) {
 				td->str[j] = a;
 				td->str[j+1] = a;
 				j = j + 2;
-			} else {
+			} else if (count > 2 && count < 10) {
 				c = count + '0';
 				td->str[j] = c;
 				td->str[j+1] = a;
 				j = j + 2;
+			} else if (count > 9){
+				sprintf(dd, "%d", count);
+				for (l = 0; l < strlen(dd); l++) {
+					td->str[j] = dd[l];
+					j++;
+				}
+				td->str[j] = a;
+				j = j+l-1;
+			} else {
+				printf("ERROR\n");
+				exit(1);
 			}
 			count = 1;
 		}
@@ -119,6 +152,7 @@ void compress(Thread_data * td) {
 	FILE* fp_out;
 	fp_out = fopen(td->out_filename, "w+");
 
+	// Verify that file was opened
 	if (fp_out == NULL) {
 		printf("ERROR: Thread %ld could not open file: %s\n", td->thread_id, td->out_filename);
 		return;
@@ -138,8 +172,7 @@ void compress(Thread_data * td) {
  * @param1: "./file.txt"
  * @param2: <int>
  * 
- * @output: "./file_txt_LOLSx.txt"
- * "-h" flag for help. 
+ * @output: "./file_txt_LOLSx.txt" 
  */
 int main(int argc, char const *argv[]) {
 
@@ -154,6 +187,12 @@ int main(int argc, char const *argv[]) {
 	char * filename = (char *)calloc(strlen(argv[1]), sizeof(char));
 	strcpy(filename, argv[1]);
 	PARTS = atoi(argv[2]);
+
+	// Verify that PARTS value is in the correct range
+	if (PARTS < 1) {
+		printf("ERROR: The number of parts must be at least one\n");
+		return 0;
+	}
 
 	// Open uncompressed file
 	FILE* fp;
@@ -170,6 +209,12 @@ int main(int argc, char const *argv[]) {
 	fscanf(fp, "%s", buffer);
 	UNCOMP_LEN = strlen(buffer);
 
+	// Report the input has exceeded the maximum character limit
+	if (UNCOMP_LEN > 999) {
+		printf("ERROR: The string has exceeded the maximum character limit\n");
+		exit(1);
+	}
+
 	// Close uncompressed file
 	fclose(fp);
 
@@ -185,6 +230,8 @@ int main(int argc, char const *argv[]) {
 	// Create ouput filenames
 	int k;
 	for (k = 0; k < PARTS; k++) {
+
+		// Copy filename into newly allocated memory
 		out_filename[k] = (char *)calloc(strlen(filename)+20, sizeof(char));
 		strcpy(out_filename[k], filename);
 
@@ -197,10 +244,13 @@ int main(int argc, char const *argv[]) {
 		}
 
 		// Concatonate _LOLSX.txt to filename
-		char suffix[strlen(filename)+15];
-		sprintf(suffix, "_LOLS%d.txt", k);
-		strcat(out_filename[k], suffix);
-		printf("%s\n", out_filename[k]);
+		if (PARTS == 1) {
+			strcat(out_filename[k], "_LOLS.txt");
+		} else {
+			char suffix[strlen(filename)+15];
+			sprintf(suffix, "_LOLS%d.txt", k);
+			strcat(out_filename[k], suffix);
+		}	
 	}
 
 	// Open threads
