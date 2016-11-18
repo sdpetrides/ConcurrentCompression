@@ -5,11 +5,13 @@
 #include <pthread.h>
 #include "compressT_LOLS.h"
 
+#define MAX_STRING_SIZE 1000
+
 // Globals
 long int UNCOMP_LEN;
 long int PARTS;
-int CHUNK[255];
-int START[255];
+int CHUNK[MAX_STRING_SIZE];
+int START[MAX_STRING_SIZE];
 
 /* INIT_CHUNK 
  *
@@ -22,16 +24,19 @@ void init_chunk() {
 	int min_size = (int)(UNCOMP_LEN / PARTS);
 	int rem = (int)(UNCOMP_LEN % PARTS);
 
+	if (!min_size) {
+		printf("ERROR: Incorrect division of characters and parts\n");
+		exit(1);
+	}
+
 	// Set minimum chunk size
 	int i;
 	for (i = 0; i < PARTS; i++) {
 		CHUNK[i] = min_size;	
 	}
 
-	// Add one to all chunks with remainder
-	for (i = 0; i < rem; i++) {
-		CHUNK[i]++;	
-	}
+	// Add remainder to first chunk
+	CHUNK[0]+=rem;
 
 	// Use start of i and size of i to set start of i+1
 	START[0] = 0;
@@ -57,64 +62,58 @@ void compress(Thread_data * td) {
 	if (fp == NULL) {
 		printf("ERROR: Thread %ld could not open file: %s\n", td->thread_id, td->filename);
 		return;
-	} else {
-		//printf("Thread %ld has opened file: %s\n", td->thread_id, td->filename);
 	}
 
 	// Extract buffer
-	char buffer[255];
+	char buffer[MAX_STRING_SIZE];
 	fscanf(fp, "%s", buffer);
 
 	// Close uncompressed file
 	fclose(fp);
 
-	// COMPRESS STRING HERE
+	// Copy chunk in to string
 	int i;
-	for (i = 0; i < CHUNK[td->thread_id]; i++) {
+	int chunk_len = CHUNK[td->thread_id];
+	for (i = 0; i < chunk_len; i++) {
 		td->str[i] = buffer[i+START[td->thread_id]];
 	}
-	char a; 
-	char b;
-	char c;
-	int count = 1;
-	int index = 0;
-	int chunkLen = CHUNK[td->thread_id];
 
-	for(int i = 1; i <= chunkLen; i++){
-		//printf("%d\n", i );
+	// Initialize counter variables
+	char a, b, c; 
+	int count = 1;
+	int j = 0;
+
+
+	// Compress string
+	for (i = 1; i <= chunk_len; i++) {
 		a = td->str[i-1];
 		b = td->str[i];
 		
-
-
-		if(a == b){
+		if (a == b) {
 			count++;
-		}else{
-			if(count == 1){
-				td->str[index] = a;
-				index ++;
-			}else if(count == 2){
-				td->str[index] = a;
-				td->str[index+1] = a;
-				index = index + 2;
-			}else{
-
-				c = count +'0';
-				td->str[index] = c;
-				td->str[index+1] = a;
-				index = index + 2;
+		} else {
+			if (count == 1) {
+				td->str[j] = a;
+				j++;
+			} else if (count == 2) {
+				td->str[j] = a;
+				td->str[j+1] = a;
+				j = j + 2;
+			} else {
+				c = count + '0';
+				td->str[j] = c;
+				td->str[j+1] = a;
+				j = j + 2;
 			}
 			count = 1;
 		}
 	}
-	while(index < chunkLen){
-		
-		td->str[index] = '\0';
-		index++;
+
+	// Add null-terminating zeros to string
+	while (j < chunk_len) {
+		td->str[j] = '\0';
+		j++;
 	}
-	
-
-
 
 	// Open compressed file
 	FILE* fp_out;
@@ -126,7 +125,6 @@ void compress(Thread_data * td) {
 	}
 
 	// Write string to compressed file
-	
 	fprintf(fp_out, "%s", td->str);
 
 	// Close compressed file
@@ -168,7 +166,7 @@ int main(int argc, char const *argv[]) {
 	}
 
 	// Get length of uncompressed string
-	char buffer[255];
+	char buffer[MAX_STRING_SIZE];
 	fscanf(fp, "%s", buffer);
 	UNCOMP_LEN = strlen(buffer);
 
@@ -226,8 +224,6 @@ int main(int argc, char const *argv[]) {
 		// Erroring checking
 		if (flag) {
 			fprintf(stderr, "ERROR: pthread_create() exited with status %d\n", flag);
-		} else {
-			//printf("Thread %ld created\n", i);
 		}
 	}
 
@@ -246,8 +242,6 @@ int main(int argc, char const *argv[]) {
 		// Erroring checking
 		if (flag) {
 			fprintf(stderr, "ERROR: pthread_join() exited with status %d\n", flag);
-		} else {
-			//printf("Thread %ld joined\n", i);
 		}
 	}
 

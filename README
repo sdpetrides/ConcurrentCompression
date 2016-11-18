@@ -10,3 +10,9 @@ Take an uncompressed txt file (bigfile.txt) as input and output multiple compres
 
 The multitreaded program will spawn threads for each part (compressT_LOLS).
 The multiprocessed program will spawn children for each part (compressR_LOLS).
+
+Special Case Handling
+
+If there not an even split of the characters to parts, we put the entire remainder into the first file.
+
+-- must be able to handle non-alphabetical characters --
