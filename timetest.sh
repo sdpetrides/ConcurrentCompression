@@ -1,0 +1,1 @@
+/time -p ./compressT_LOLS ./smallfile.txt 1

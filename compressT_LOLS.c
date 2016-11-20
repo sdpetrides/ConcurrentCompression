@@ -5,7 +5,7 @@
 #include <pthread.h>
 #include "compressT_LOLS.h"
 
-#define MAX_STRING_SIZE 1000
+#define MAX_STRING_SIZE 10000
 
 // Globals
 long int UNCOMP_LEN;
@@ -210,7 +210,7 @@ int main(int argc, char const *argv[]) {
 	UNCOMP_LEN = strlen(buffer);
 
 	// Report the input has exceeded the maximum character limit
-	if (UNCOMP_LEN > 999) {
+	if (UNCOMP_LEN > MAX_STRING_SIZE) {
 		printf("ERROR: The string has exceeded the maximum character limit\n");
 		exit(1);
 	}
