@@ -4,5 +4,7 @@
 // Structs
 
 // Functions
+void init_out_name(char * out_filename[], char * filename);
+void init_chunk();
 
 #endif

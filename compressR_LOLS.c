@@ -7,14 +7,84 @@
 
 long int UNCOMP_LEN;
 long int PARTS;
+int * CHUNK;
+int * START;
+
+/* INIT_OUT_NAME 
+ *
+ * Uses filename and PARTS to set the output filename
+ * for each thread.
+ */
+void init_out_name(char * out_filename[], char * filename) {
+
+	int k;
+	for (k = 0; k < PARTS; k++) {
+
+		// Copy filename into newly allocated memory
+		out_filename[k] = (char *)calloc(strlen(filename)+20, sizeof(char));
+		strcpy(out_filename[k], filename);
+
+		// Replace '.' with '_'
+		int j;
+		for (j = 1; j < strlen(filename); j++) {
+			if (out_filename[k][j] == '.') {
+				out_filename[k][j] = '_';
+			}
+		}
+
+		// Concatonate _LOLSX.txt to filename
+		if (PARTS == 1) {
+			strcat(out_filename[k], "_LOLS.txt");
+		} else {
+			char suffix[strlen(filename)+15];
+			sprintf(suffix, "_LOLS%d.txt", k);
+			strcat(out_filename[k], suffix);
+		}	
+	}
+}
+
+/* INIT_CHUNK 
+ *
+ * Uses globals UNCOMP_LEN and PARTS to set the chunk size
+ * and start index for each thread.
+ */
+void init_chunk() {
+
+	// Initialize and allocate memory for parts and start values	
+	CHUNK = (int *)malloc(sizeof(int)*PARTS);
+	START = (int *)malloc(sizeof(int)*PARTS);
+
+	// Initialize minimum chunk size and remainder
+	int min_size = (int)(UNCOMP_LEN / PARTS);
+	int rem = (int)(UNCOMP_LEN % PARTS);
+
+	if (!min_size) {
+		printf("ERROR: Incorrect division of characters and parts\n");
+		exit(1);
+	}
+
+	// Set minimum chunk size
+	int i;
+	for (i = 0; i < PARTS; i++) {
+		CHUNK[i] = min_size;	
+	}
+
+	// Add remainder to first chunk
+	CHUNK[0]+=rem;
+
+	// Use start of i and size of i to set start of i+1
+	START[0] = 0;
+	for (i = 0; i < PARTS; i++) {
+		START[i+1] = CHUNK[i] + START[i];	
+	}
+}
 
 /* MAIN
  *
  * @param1: "./file.txt"
  * @param2: <int>
  * 
- * @output: "./file_txt_LOLSx.txt"
- * "-h" flag for help. 
+ * @output: "./file_txt_LOLSx.txt" 
  */
 int main(int argc, char const *argv[]) {
 
@@ -26,9 +96,15 @@ int main(int argc, char const *argv[]) {
 	}
 
 	// Get command line arguments
-	char * filename = (char *)malloc(sizeof(char)*strlen(argv[1]));
+	char * filename = (char *)calloc(strlen(argv[1]), sizeof(char));
 	filename = strcpy(filename, argv[1]);
 	PARTS = atoi(argv[2]);
+
+	// Verify that PARTS value is in the correct range
+	if (PARTS < 1) {
+		printf("ERROR: The number of parts must be at least one\n");
+		return 0;
+	}
 	
 	// Open uncompressed file
 	FILE* fp;
@@ -41,9 +117,21 @@ int main(int argc, char const *argv[]) {
 	}
 
 	// Get length of uncompressed string
-	char buffer[255];
-	fscanf(fp, "%s", buffer);
-	UNCOMP_LEN = strlen(buffer);
+	UNCOMP_LEN = 0;
+	char c;
+	while ((c = fgetc(fp))) {
+    	if (c == EOF) {
+    		break;
+    	}
+		UNCOMP_LEN+=1;
+	}
+
+	// Close uncompressed file
+	fclose(fp);
+
+	// Initialize output filenames
+	char * out_filename[PARTS];
+	init_out_name(out_filename, filename);
 
 	// Initialize processes
 	pid_t id[PARTS];
@@ -51,6 +139,7 @@ int main(int argc, char const *argv[]) {
 
 	// Fork and exec() all processes
 	int i;
+	int flag = 0;
 	for (i = 0; i < PARTS; i++) {
 
 		// Fork()
@@ -62,20 +151,25 @@ int main(int argc, char const *argv[]) {
 				perror("fork");
 				exit(1);
 			case 0:
-				printf("Child:  Running process %d from parent process %d\n", getpid(), getppid());
-				sleep(2); // exec() compressR_worder_LOLS.c
-				exit(0);
+				//printf("Child:  Running process %d from parent process %d\n", getpid(), getppid());
+				//flag = execvp("./compressR_worker_LOLS.c", argv);
+				if (flag == -1) {
+					printf("ERROR: exec() failed\n");
+					exit(1);
+				} else {
+					exit(1);
+				}
 		}
 	}
 
 	// Wait on all processes
 	for (i = 0; i < PARTS; i++) {
 		waitpid(id[i], &child_status, 0);
-		printf("Parent: Child process %d exited with status process %d\n", id[i], child_status);
+		//printf("Parent: Child process %d exited with status process %d\n", id[i], child_status);
 	}
 
-	// Close uncompressed file
-	fclose(fp);
+	// Free filename string
+	free(filename);
 	
 	return 0;
 }

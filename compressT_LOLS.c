@@ -5,13 +5,11 @@
 #include <pthread.h>
 #include "compressT_LOLS.h"
 
-#define MAX_STRING_SIZE 10000
-
 // Globals
 long int UNCOMP_LEN;
 long int PARTS;
-int CHUNK[MAX_STRING_SIZE];
-int START[MAX_STRING_SIZE];
+int * CHUNK;
+int * START;
 
 /* ISALPHA
  * 
@@ -27,12 +25,49 @@ int isAlpha(int c) {
 	}
 }
 
+/* INIT_OUT_NAME 
+ *
+ * Uses filename and PARTS to set the output filename
+ * for each thread.
+ */
+void init_out_name(char * out_filename[], char * filename) {
+
+	int k;
+	for (k = 0; k < PARTS; k++) {
+
+		// Copy filename into newly allocated memory
+		out_filename[k] = (char *)calloc(strlen(filename)+20, sizeof(char));
+		strcpy(out_filename[k], filename);
+
+		// Replace '.' with '_'
+		int j;
+		for (j = 1; j < strlen(filename); j++) {
+			if (out_filename[k][j] == '.') {
+				out_filename[k][j] = '_';
+			}
+		}
+
+		// Concatonate _LOLSX.txt to filename
+		if (PARTS == 1) {
+			strcat(out_filename[k], "_LOLS.txt");
+		} else {
+			char suffix[strlen(filename)+15];
+			sprintf(suffix, "_LOLS%d.txt", k);
+			strcat(out_filename[k], suffix);
+		}	
+	}
+}
+
 /* INIT_CHUNK 
  *
  * Uses globals UNCOMP_LEN and PARTS to set the chunk size
  * and start index for each thread.
  */
 void init_chunk() {
+
+	// Initialize and allocate memory for parts and start values	
+	CHUNK = (int *)malloc(sizeof(int)*PARTS);
+	START = (int *)malloc(sizeof(int)*PARTS);
 
 	// Initialize minimum chunk size and remainder
 	int min_size = (int)(UNCOMP_LEN / PARTS);
@@ -78,26 +113,26 @@ void compress(Thread_data * td) {
 		return;
 	}
 
-	// Extract buffer
-	char buffer[MAX_STRING_SIZE];
-	fscanf(fp, "%s", buffer);
-
-	// Close uncompressed file
-	fclose(fp);
+	// Move file handler to start position
+	fseek(fp, START[td->thread_id], SEEK_SET);
 
 	// Copy chunk in to string
-	int i;
+	int i, k;
 	int chunk_len = CHUNK[td->thread_id];
-	for (i = 0; i < chunk_len; i++) {
+	for (i = 0, k = 0; i < chunk_len; i++) {
 
-		// Get character from buffer
-		char c = buffer[i+START[td->thread_id]];
+		// Get character from file
+		char c = fgetc(fp);
 
 		// Check if alphabetical
 		if (isAlpha((int)c)) {
-			td->str[i] = c;
-		}	
+			td->str[k] = c;
+			k++;
+		}
 	}
+
+	// Close uncompressed file
+	fclose(fp);
 
 	// Initialize counter variables
 	char a, b, c; 
@@ -205,14 +240,13 @@ int main(int argc, char const *argv[]) {
 	}
 
 	// Get length of uncompressed string
-	char buffer[MAX_STRING_SIZE];
-	fscanf(fp, "%s", buffer);
-	UNCOMP_LEN = strlen(buffer);
-
-	// Report the input has exceeded the maximum character limit
-	if (UNCOMP_LEN > MAX_STRING_SIZE) {
-		printf("ERROR: The string has exceeded the maximum character limit\n");
-		exit(1);
+	UNCOMP_LEN = 0;
+	char c;
+	while ((c = fgetc(fp))) {
+    	if (c == EOF) {
+    		break;
+    	}
+		UNCOMP_LEN+=1;
 	}
 
 	// Close uncompressed file
@@ -227,31 +261,8 @@ int main(int argc, char const *argv[]) {
 	char * out_filename[PARTS];
 	Thread_data * td[PARTS];
 
-	// Create ouput filenames
-	int k;
-	for (k = 0; k < PARTS; k++) {
-
-		// Copy filename into newly allocated memory
-		out_filename[k] = (char *)calloc(strlen(filename)+20, sizeof(char));
-		strcpy(out_filename[k], filename);
-
-		// Replace '.' with '_'
-		int j;
-		for (j = 1; j < strlen(filename); j++) {
-			if (out_filename[k][j] == '.') {
-				out_filename[k][j] = '_';
-			}
-		}
-
-		// Concatonate _LOLSX.txt to filename
-		if (PARTS == 1) {
-			strcat(out_filename[k], "_LOLS.txt");
-		} else {
-			char suffix[strlen(filename)+15];
-			sprintf(suffix, "_LOLS%d.txt", k);
-			strcat(out_filename[k], suffix);
-		}	
-	}
+	// Initialize output filenames
+	init_out_name(out_filename, filename);
 
 	// Open threads
 	int flag = 0;

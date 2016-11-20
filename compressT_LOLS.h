@@ -11,6 +11,7 @@ typedef struct thread_data {
 
 // Functions
 int isAlpha(int c);
+void init_out_name(char * out_filename[], char * filename);
 void init_chunk();
 void compress(Thread_data * td);
 
