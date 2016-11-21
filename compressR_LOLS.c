@@ -1,4 +1,3 @@
-// Process Manager/Parent
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -129,18 +128,45 @@ int main(int argc, char const *argv[]) {
 	// Close uncompressed file
 	fclose(fp);
 
+	// Initialize chunk and start values
+	init_chunk();
+
 	// Initialize output filenames
 	char * out_filename[PARTS];
 	init_out_name(out_filename, filename);
 
 	// Initialize processes
 	pid_t id[PARTS];
+	char * chunk_str[PARTS];
+	char * start_str[PARTS];
 	int child_status;
+
+	// Initialize arguments array
+	char ** arguments[PARTS];
 
 	// Fork and exec() all processes
 	int i;
 	int flag = 0;
 	for (i = 0; i < PARTS; i++) {
+
+		// Allocate space for chunk and start strings
+		chunk_str[i] = (char *)calloc(10, sizeof(char));
+		start_str[i] = (char *)calloc(10, sizeof(char));
+
+		// Format chunk and start strings
+		sprintf(chunk_str[i], "%d", CHUNK[i]);
+		sprintf(start_str[i], "%d", START[i]);
+
+		// Allocate space for the arguments
+		arguments[i] = (char **)malloc(sizeof(char *)*6);
+
+		// Initialize the arguments
+		arguments[i][0] = "./compressR_worker_LOLS";
+		arguments[i][1] = filename;
+		arguments[i][2] = out_filename[i];
+		arguments[i][3] = chunk_str[i];
+		arguments[i][4] = start_str[i];
+		arguments[i][5] = NULL;
 
 		// Fork()
 		id[i] = fork();
@@ -151,8 +177,11 @@ int main(int argc, char const *argv[]) {
 				perror("fork");
 				exit(1);
 			case 0:
-				//printf("Child:  Running process %d from parent process %d\n", getpid(), getppid());
-				//flag = execvp("./compressR_worker_LOLS.c", argv);
+
+				// Execute compressR_worker_LOLS
+				flag = execvp("./compressR_worker_LOLS", arguments[i]);
+
+				// Error check for exec()
 				if (flag == -1) {
 					printf("ERROR: exec() failed\n");
 					exit(1);
@@ -164,12 +193,19 @@ int main(int argc, char const *argv[]) {
 
 	// Wait on all processes
 	for (i = 0; i < PARTS; i++) {
+
+		// Wait for each PID
 		waitpid(id[i], &child_status, 0);
-		//printf("Parent: Child process %d exited with status process %d\n", id[i], child_status);
+
+		// Free argument strings
+		free(arguments[i]);
+		free(chunk_str[i]);
+		free(start_str[i]);
+		free(out_filename[i]);
 	}
 
-	// Free filename string
+	// Free filename
 	free(filename);
-	
+
 	return 0;
 }
