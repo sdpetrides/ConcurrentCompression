@@ -18,3 +18,14 @@ Non-alphabetical characters are skipped and not considered in the compressed str
 Our first output file is named with a filename_txt_LOLS0.txt.
 Our maximum string size is 1000 characters. After this mark the program will exit and report the maximum character limit has been reached.
 An error is reported and the program exits if the number of parts is less than one.
+
+
+MULTITHREADED PROGRAM
+
+Global integer arrays CHUNK and START are used to partition the input file so that each thread properly works with the correct numbers of characters based on the user input of partition size. 
+
+The user inputs the partition size, PARTS. The total number of characters in the uncompressed string of characters, UNCOMP_LEN, divided by PARTS is the minimum size of each chunk. This value is inserted into each index of CHUNK from 0 to (PARTS). Whatever the remainder of UNCOMP_LEN/PARTS is, is added to the first elements of CHUNK from 0 to UNCOMP_LEN/PARTS index positions in CHUNK. 
+
+CHUNK is used to set the start position in the input file of each thread. Each index in START represents a thread, there are PARTS threads in total. START[i+1] = CHUNK[i] + START[i], uses the START of i and CHUNK of i to set START of i +1. 
+
+These global arrays are initialized in method init_chunk().
