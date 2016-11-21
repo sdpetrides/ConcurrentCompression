@@ -1,0 +1,98 @@
+Testing on 50kb txt file
+
+Threading 1
+  0.01s user 0.00s system 86% cpu 0.013 total
+  0.01s user 0.00s system 86% cpu 0.009 total
+  0.01s user 0.00s system 85% cpu 0.011 total
+  0.01s user 0.00s system 87% cpu 0.009 total
+  0.01s user 0.00s system 87% cpu 0.009 total
+Threading 2
+  0.01s user 0.00s system 110% cpu 0.008 total
+  0.01s user 0.00s system 110% cpu 0.009 total
+  0.01s user 0.00s system 105% cpu 0.009 total
+  0.01s user 0.00s system 105% cpu 0.008 total
+  0.01s user 0.00s system 107% cpu 0.008 total
+Threading 4
+  0.01s user 0.00s system 119% cpu 0.009 total
+  0.01s user 0.00s system 141% cpu 0.008 total
+  0.01s user 0.00s system 136% cpu 0.008 total
+  0.01s user 0.00s system 141% cpu 0.008 total
+  0.01s user 0.00s system 114% cpu 0.010 total
+Threading 8
+  0.01s user 0.00s system 147% cpu 0.010 total
+  0.01s user 0.00s system 144% cpu 0.009 total
+  0.01s user 0.00s system 131% cpu 0.009 total
+  0.01s user 0.00s system 138% cpu 0.008 total
+  0.01s user 0.00s system 141% cpu 0.009 total
+Threading 16
+  0.01s user 0.01s system 143% cpu 0.010 total
+  0.01s user 0.00s system 153% cpu 0.009 total
+  0.01s user 0.00s system 148% cpu 0.009 total
+  0.01s user 0.00s system 148% cpu 0.009 total
+  0.01s user 0.00s system 133% cpu 0.010 total
+Threading 32
+  0.01s user 0.01s system 132% cpu 0.013 total
+  0.01s user 0.01s system 136% cpu 0.013 total
+  0.01s user 0.01s system 141% cpu 0.012 total
+  0.01s user 0.01s system 143% cpu 0.012 total
+  0.01s user 0.01s system 160% cpu 0.010 total
+Threading 64
+  0.01s user 0.01s system 176% cpu 0.014 total
+  0.01s user 0.01s system 153% cpu 0.015 total
+  0.01s user 0.01s system 137% cpu 0.018 total
+  0.01s user 0.01s system 144% cpu 0.017 total
+  0.01s user 0.02s system 166% cpu 0.016 total
+Threading 128
+  0.01s user 0.03s system 202% cpu 0.020 total
+  0.01s user 0.03s system 219% cpu 0.018 total
+  0.01s user 0.03s system 210% cpu 0.018 total
+  0.01s user 0.02s system 160% cpu 0.023 total
+  0.01s user 0.03s system 195% cpu 0.021 total
+Processing 1
+  0.01s user 0.00s system 78% cpu 0.014 total
+  0.01s user 0.00s system 79% cpu 0.014 total
+  0.01s user 0.00s system 83% cpu 0.014 total
+  0.01s user 0.01s system 79% cpu 0.018 total
+  0.01s user 0.00s system 80% cpu 0.015 total
+Processing 2
+  0.01s user 0.01s system 113% cpu 0.014 total
+  0.01s user 0.01s system 111% cpu 0.014 total
+  0.01s user 0.01s system 98% cpu 0.017 total
+  0.01s user 0.00s system 117% cpu 0.012 total
+  0.01s user 0.01s system 107% cpu 0.014 total
+Processing 4
+  0.01s user 0.01s system 130% cpu 0.019 total
+  0.01s user 0.01s system 169% cpu 0.012 total
+  0.01s user 0.01s system 151% cpu 0.014 total
+  0.01s user 0.01s system 153% cpu 0.015 total
+  0.01s user 0.01s system 148% cpu 0.015 total
+Processing 8
+  0.02s user 0.01s system 160% cpu 0.019 total
+  0.02s user 0.02s system 169% cpu 0.022 total
+  0.02s user 0.01s system 171% cpu 0.017 total
+  0.02s user 0.02s system 156% cpu 0.021 total
+  0.02s user 0.02s system 156% cpu 0.021 total
+Processing 16
+  0.03s user 0.03s system 179% cpu 0.033 total
+  0.03s user 0.03s system 185% cpu 0.030 total
+  0.03s user 0.03s system 186% cpu 0.034 total
+  0.03s user 0.03s system 167% cpu 0.036 total
+  0.03s user 0.03s system 186% cpu 0.030 total
+Processing 32
+  0.05s user 0.06s system 205% cpu 0.053 total
+  0.05s user 0.06s system 196% cpu 0.056 total
+  0.05s user 0.06s system 188% cpu 0.056 total
+  0.05s user 0.06s system 193% cpu 0.055 total
+  0.05s user 0.06s system 195% cpu 0.054 total
+Processing 64
+  0.08s user 0.12s system 206% cpu 0.096 total
+  0.08s user 0.12s system 204% cpu 0.099 total
+  0.08s user 0.12s system 212% cpu 0.095 total
+  0.08s user 0.12s system 209% cpu 0.095 total
+  0.08s user 0.12s system 205% cpu 0.097 total
+Processing 128
+  0.15s user 0.23s system 212% cpu 0.182 total
+  0.15s user 0.23s system 215% cpu 0.180 total
+  0.15s user 0.23s system 218% cpu 0.178 total
+  0.15s user 0.23s system 215% cpu 0.180 total
+  0.15s user 0.23s system 214% cpu 0.180 total

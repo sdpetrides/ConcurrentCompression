@@ -1,47 +1,96 @@
+echo Threading 1
 time ./compressT_LOLS ./smallfile.txt 1
 time ./compressT_LOLS ./smallfile.txt 1
 time ./compressT_LOLS ./smallfile.txt 1
 time ./compressT_LOLS ./smallfile.txt 1
 time ./compressT_LOLS ./smallfile.txt 1
-echo
+echo Threading 2
 time ./compressT_LOLS ./smallfile.txt 2
 time ./compressT_LOLS ./smallfile.txt 2
 time ./compressT_LOLS ./smallfile.txt 2
 time ./compressT_LOLS ./smallfile.txt 2
 time ./compressT_LOLS ./smallfile.txt 2
-echo
+echo Threading 4
 time ./compressT_LOLS ./smallfile.txt 4
 time ./compressT_LOLS ./smallfile.txt 4
 time ./compressT_LOLS ./smallfile.txt 4
 time ./compressT_LOLS ./smallfile.txt 4
 time ./compressT_LOLS ./smallfile.txt 4
-echo
+echo Threading 8
 time ./compressT_LOLS ./smallfile.txt 8
 time ./compressT_LOLS ./smallfile.txt 8
 time ./compressT_LOLS ./smallfile.txt 8
 time ./compressT_LOLS ./smallfile.txt 8
 time ./compressT_LOLS ./smallfile.txt 8
-echo
+echo Threading 16
 time ./compressT_LOLS ./smallfile.txt 16
 time ./compressT_LOLS ./smallfile.txt 16
 time ./compressT_LOLS ./smallfile.txt 16
 time ./compressT_LOLS ./smallfile.txt 16
 time ./compressT_LOLS ./smallfile.txt 16
-echo
+echo Threading 32
 time ./compressT_LOLS ./smallfile.txt 32
 time ./compressT_LOLS ./smallfile.txt 32
 time ./compressT_LOLS ./smallfile.txt 32
 time ./compressT_LOLS ./smallfile.txt 32
 time ./compressT_LOLS ./smallfile.txt 32
-echo
+echo Threading 64
 time ./compressT_LOLS ./smallfile.txt 64
 time ./compressT_LOLS ./smallfile.txt 64
 time ./compressT_LOLS ./smallfile.txt 64
 time ./compressT_LOLS ./smallfile.txt 64
 time ./compressT_LOLS ./smallfile.txt 64
-echo
+echo Threading 128
 time ./compressT_LOLS ./smallfile.txt 128
 time ./compressT_LOLS ./smallfile.txt 128
 time ./compressT_LOLS ./smallfile.txt 128
 time ./compressT_LOLS ./smallfile.txt 128
 time ./compressT_LOLS ./smallfile.txt 128
+echo Processing 1
+time ./compressR_LOLS ./smallfile.txt 1
+time ./compressR_LOLS ./smallfile.txt 1
+time ./compressR_LOLS ./smallfile.txt 1
+time ./compressR_LOLS ./smallfile.txt 1
+time ./compressR_LOLS ./smallfile.txt 1
+echo Processing 2
+time ./compressR_LOLS ./smallfile.txt 2
+time ./compressR_LOLS ./smallfile.txt 2
+time ./compressR_LOLS ./smallfile.txt 2
+time ./compressR_LOLS ./smallfile.txt 2
+time ./compressR_LOLS ./smallfile.txt 2
+echo Processing 4
+time ./compressR_LOLS ./smallfile.txt 4
+time ./compressR_LOLS ./smallfile.txt 4
+time ./compressR_LOLS ./smallfile.txt 4
+time ./compressR_LOLS ./smallfile.txt 4
+time ./compressR_LOLS ./smallfile.txt 4
+echo Processing 8
+time ./compressR_LOLS ./smallfile.txt 8
+time ./compressR_LOLS ./smallfile.txt 8
+time ./compressR_LOLS ./smallfile.txt 8
+time ./compressR_LOLS ./smallfile.txt 8
+time ./compressR_LOLS ./smallfile.txt 8
+echo Processing 16
+time ./compressR_LOLS ./smallfile.txt 16
+time ./compressR_LOLS ./smallfile.txt 16
+time ./compressR_LOLS ./smallfile.txt 16
+time ./compressR_LOLS ./smallfile.txt 16
+time ./compressR_LOLS ./smallfile.txt 16
+echo Processing 32
+time ./compressR_LOLS ./smallfile.txt 32
+time ./compressR_LOLS ./smallfile.txt 32
+time ./compressR_LOLS ./smallfile.txt 32
+time ./compressR_LOLS ./smallfile.txt 32
+time ./compressR_LOLS ./smallfile.txt 32
+echo Processing 64
+time ./compressR_LOLS ./smallfile.txt 64
+time ./compressR_LOLS ./smallfile.txt 64
+time ./compressR_LOLS ./smallfile.txt 64
+time ./compressR_LOLS ./smallfile.txt 64
+time ./compressR_LOLS ./smallfile.txt 64
+echo Processing 128
+time ./compressR_LOLS ./smallfile.txt 128
+time ./compressR_LOLS ./smallfile.txt 128
+time ./compressR_LOLS ./smallfile.txt 128
+time ./compressR_LOLS ./smallfile.txt 128
+time ./compressR_LOLS ./smallfile.txt 128
