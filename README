@@ -29,3 +29,9 @@ The user inputs the partition size, PARTS. The total number of characters in the
 CHUNK is used to set the start position in the input file of each thread. Each index in START represents a thread, there are PARTS threads in total. START[i+1] = CHUNK[i] + START[i], uses the START of i and CHUNK of i to set START of i +1. 
 
 These global arrays are initialized in method init_chunk().
+
+Our program creates threads in the main() method, these threads are inserted into an array of threads of length PARTS. Main loops through the array spawning threads that execute the function compress on the correct segment of the input file. 
+
+A struct thread_data is created for each thread. Its members are long int thread_id char * filename, char * out_filename, char * str. Ultimately, the struct holds the uncompressed characters and after compress is executed, holds the compressed form in str.
+
+Main is the programs managing function, calling method init_chunk() spawning and joining threads as well as managing memory (mallocing and freeing). Compress is the worker function; it looks at each character in the thread's segment of characters and creates a compressed version and updates char *str. Also it opens a compressed file with a specific name based on the thread ID and writes the compressed string to that file. 
