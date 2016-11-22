@@ -6,6 +6,15 @@ Andrew Macneille
 
 A multithreaded and a multiprocessed multipart compression program.
 
+INSTRUCTIONS
+
+Compile with make command. A makefile is included.
+
+$ ./compressT_LOLS ./file.txt <int>
+$ ./compressR_LOLS ./file.txt <int>
+
+If an incorrect number of parameters are run the program will output an error and exit.
+
 SUMMARY
 
 The multitreaded program will spawn threads for each part (compressT_LOLS) while the multiprocessed program will spawn child processes for each part (compressR_LOLS). In our program, all compression is done in threads and child processes. Each one reads its own input file and writes to its output file.
@@ -24,7 +33,7 @@ TESTING
 
 Our testing includes time tests and special case handling. The special case handling is included below.
 
-To test the speed of the programs we ran the two executables with small and large txt files (50kb and 250kb) with varying parts values (ranging from 1 to 128). This is included in the timetest.sh file. The output of these test are in the testing_output.txt file.
+To test the speed of the programs we ran the two executables with small and large txt files (50kb and 250kb) with varying parts values (ranging from 1 to 128). This is included in the timetest.sh file. The output of these test are in the timetests.txt file.
 
 In the smaller file (50kb), both the multithreading and multiprocessing runs were the most efficient when broken into 2 or 4 parts. Multithreading dropped an average 0.002 seconds from 1 part to 2 parts and from 2 parts to 4 parts. Multiprocessing dropped 0.002 seconds from 1 part to 2 parts but began to increase after 2 parts.
 
