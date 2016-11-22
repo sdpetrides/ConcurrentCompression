@@ -30,8 +30,14 @@ According to the output, both the multithreading and multiprocessing runs were t
 
 This demonstrates an important principle of concurrent programming: for the thread or process to save time, it must work hard enough that it is worth it to add contact switches to the kernel. In this case, the time it takes to spawn child processes and create threads is only worth the time saved from the compression of a few thousand characters. Therefore, as the file size increases, the more threads and processes should be spawned.
 
+Furthermore, the time it takes to initialize a new process is greater than the time it takes to initialize a new thread.
+
 SPECIAL CASE HANDLING
 
-If there not an even split of the characters to parts, we put the entire remainder into the first file.
+If there an uneven split of characters to parts, we put the entire remainder into the first file.
 Non-alphabetical characters are skipped and not considered in the compressed string.
-An error is reported and the program exits if the number of parts is less than one.
+An error is reported and the program exits if the number of parts is less than one or if the number of parts.
+An error is reported and the program exits if the number of parts exceeds the length of characters in the string.
+An error is reported and the program exits if the parameters are not entered correctly.
+An error is reported and the program exits if the input file cannot be opened (if it does not exit on the given path).
+Error are reported if the output files cannot be opened.

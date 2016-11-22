@@ -1,1 +1,9 @@
-Your testing parameters to bug check your code and be sure it handles all likely errors well.
+TESTPLAN
+
+If there an uneven split of characters to parts, we put the entire remainder into the first file.
+Non-alphabetical characters are skipped and not considered in the compressed string.
+An error is reported and the program exits if the number of parts is less than one or if the number of parts.
+An error is reported and the program exits if the number of parts exceeds the length of characters in the string.
+An error is reported and the program exits if the parameters are not entered correctly.
+An error is reported and the program exits if the input file cannot be opened (if it does not exit on the given path).
+Error are reported if the output files cannot be opened.
