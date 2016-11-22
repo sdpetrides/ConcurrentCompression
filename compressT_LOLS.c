@@ -219,7 +219,7 @@ int main(int argc, char const *argv[]) {
 	}
 
 	// Get command line arguments
-	char * filename = (char *)calloc(strlen(argv[1]), sizeof(char));
+	char * filename = (char *)calloc(strlen(argv[1])+1, sizeof(char));
 	strcpy(filename, argv[1]);
 	PARTS = atoi(argv[2]);
 

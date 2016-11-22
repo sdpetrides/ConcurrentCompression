@@ -137,11 +137,11 @@ void compress(char * filename, char * out_filename, char * str, int chunk, int s
 int main(int argc, char const *argv[]) {
 
 	// Allocate space for and initialize input filename
-	char * filename = (char *)calloc(strlen(argv[1]), sizeof(char)); 
+	char * filename = (char *)calloc(strlen(argv[1])+1, sizeof(char)); 
 	strcpy(filename, argv[1]);
 
 	// Allocate space for and initalize output filename
-	char * out_filename = (char *)calloc(strlen(argv[2]), sizeof(char));
+	char * out_filename = (char *)calloc(strlen(argv[2])+1, sizeof(char));
 	strcpy(out_filename, argv[2]);
 
 	// Initialize chunk and size
