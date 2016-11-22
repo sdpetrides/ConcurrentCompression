@@ -34,4 +34,12 @@ Our program creates threads in the main() method, these threads are inserted int
 
 A struct thread_data is created for each thread. Its members are long int thread_id char * filename, char * out_filename, char * str. Ultimately, the struct holds the uncompressed characters and after compress is executed, holds the compressed form in str.
 
-Main is the programs managing function, calling method init_chunk() spawning and joining threads as well as managing memory (mallocing and freeing). Compress is the worker function; it looks at each character in the thread's segment of characters and creates a compressed version and updates char *str. Also it opens a compressed file with a specific name based on the thread ID and writes the compressed string to that file. 
+Main is the programs managing function, calling method init_chunk() spawning and joining threads as well as managing memory (mallocing and freeing). Compress is the worker function; it looks at each character in the thread's segment of characters and creates a compressed version and updates char *str. Also it opens a compressed file with a specific name based on the thread ID and writes the compressed string to that file.
+
+MULTIPROCESSED PROGRAM
+
+
+
+
+
+
