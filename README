@@ -38,8 +38,4 @@ Main is the programs managing function, calling method init_chunk() spawning and
 
 MULTIPROCESSED PROGRAM
 
-
-
-
-
-
+The multi-processed program is structured similar to the multi threaded program. It contains global arrays CHUNK and START and they are both initialized similarly. Also, the main program is the 
